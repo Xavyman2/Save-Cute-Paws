@@ -43,9 +43,13 @@ export default function AdminDashboard() {
       setIsLoading(true);
       setError(null);
       
+      console.log('Fetching from API routes...');
+      
       // Check Sanity connection via API route
       const statusResponse = await fetch('/api/admin/status');
       const statusData = await statusResponse.json();
+      
+      console.log('Status response:', statusResponse.status, statusData);
       
       if (!statusResponse.ok) {
         setError(statusData.message || 'Failed to connect to Sanity CMS');
@@ -56,6 +60,8 @@ export default function AdminDashboard() {
       const usersResponse = await fetch('/api/admin/users');
       const usersData = await usersResponse.json();
       
+      console.log('Users response:', usersResponse.status, usersData);
+      
       if (usersResponse.ok) {
         setUsers(usersData.users || []);
       }
@@ -64,6 +70,8 @@ export default function AdminDashboard() {
       const postsResponse = await fetch('/api/admin/posts');
       const postsData = await postsResponse.json();
       
+      console.log('Posts response:', postsResponse.status, postsData);
+      
       if (postsResponse.ok) {
         setPosts(postsData.posts || []);
       }
@@ -71,6 +79,8 @@ export default function AdminDashboard() {
       // Fetch stats via API route
       const statsResponse = await fetch('/api/admin/stats');
       const statsData = await statsResponse.json();
+      
+      console.log('Stats response:', statsResponse.status, statsData);
       
       if (statsResponse.ok) {
         setStats(statsData.stats);
