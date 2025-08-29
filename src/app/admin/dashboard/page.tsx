@@ -43,54 +43,38 @@ export default function AdminDashboard() {
       setIsLoading(true);
       setError(null);
       
-      // Check if Sanity is configured
-      const hasEnvVars = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && process.env.NEXT_PUBLIC_SANITY_DATASET;
+      // Check Sanity connection via API route
+      const statusResponse = await fetch('/api/admin/status');
+      const statusData = await statusResponse.json();
       
-      if (!hasEnvVars) {
-        setError('Sanity CMS is not configured. Please set up environment variables.');
+      if (!statusResponse.ok) {
+        setError(statusData.message || 'Failed to connect to Sanity CMS');
         return;
       }
 
-      // Try to import Sanity client dynamically
-      const { client } = await import("@/sanity/lib/client");
-      const { groq } = await import("next-sanity");
-
-      // Fetch posts
-      const postsData = await client.fetch(groq`*[_type == "post"]{
-        _id,
-        title,
-        "slug": slug.current,
-        "author": author->name,
-        "mainImage": mainImage.asset->url,
-        publishedAt
-      } | order(publishedAt desc)[0...5]`);
-      setPosts(postsData || []);
-
-      // Fetch users
-      const usersData = await client.fetch(groq`*[_type == "user"]{
-        _id,
-        name,
-        email,
-        role,
-        isVolunteer,
-        joinedAt
-      } | order(joinedAt desc)[0...10]`);
-      setUsers(usersData || []);
-
-      // Fetch stats
-      const totalPosts = await client.fetch(groq`count(*[_type == "post"])`);
-      const publishedPosts = await client.fetch(groq`count(*[_type == "post" && defined(publishedAt)])`);
-      const draftPosts = await client.fetch(groq`count(*[_type == "post" && !defined(publishedAt)])`);
-      const totalUsers = await client.fetch(groq`count(*[_type == "user"])`);
-      const volunteers = await client.fetch(groq`count(*[_type == "user" && isVolunteer == true])`);
+      // Fetch users via API route
+      const usersResponse = await fetch('/api/admin/users');
+      const usersData = await usersResponse.json();
       
-      setStats({
-        totalPosts: totalPosts || 0,
-        publishedPosts: publishedPosts || 0,
-        draftPosts: draftPosts || 0,
-        totalUsers: totalUsers || 0,
-        volunteers: volunteers || 0,
-      });
+      if (usersResponse.ok) {
+        setUsers(usersData.users || []);
+      }
+
+      // Fetch posts via API route
+      const postsResponse = await fetch('/api/admin/posts');
+      const postsData = await postsResponse.json();
+      
+      if (postsResponse.ok) {
+        setPosts(postsData.posts || []);
+      }
+
+      // Fetch stats via API route
+      const statsResponse = await fetch('/api/admin/stats');
+      const statsData = await statsResponse.json();
+      
+      if (statsResponse.ok) {
+        setStats(statsData.stats);
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
       setError('Unable to connect to Sanity CMS. Please check your configuration.');
