@@ -22,14 +22,32 @@ interface UserData {
 }
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession()
   const router = useRouter()
   const [userData, setUserData] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
   const [error, setError] = useState('')
+  const [isClient, setIsClient] = useState(false)
+  
+  // Safe session handling
+  let session = null
+  let status = 'loading'
+  
+  try {
+    const sessionData = useSession()
+    session = sessionData?.data
+    status = sessionData?.status || 'loading'
+  } catch (error) {
+    console.log('Auth not available during build')
+    status = 'unauthenticated'
+  }
 
   useEffect(() => {
+    setIsClient(true)
+    
+    // Only handle auth on client side
+    if (!isClient) return
+    
     if (status === 'unauthenticated') {
       router.push('/auth/signin')
       return
@@ -38,7 +56,7 @@ export default function ProfilePage() {
     if (session?.user?.id) {
       fetchUserData()
     }
-  }, [session, status, router])
+  }, [session, status, router, isClient])
 
   const fetchUserData = async () => {
     try {
@@ -81,7 +99,8 @@ export default function ProfilePage() {
     }
   }
 
-  if (status === 'loading' || loading) {
+  // Show loading during SSR or when auth is loading
+  if (!isClient || status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-pink-50 flex items-center justify-center">
         <div className="text-center">
