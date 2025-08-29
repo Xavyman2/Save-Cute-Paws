@@ -1,28 +1,34 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import { signIn, getSession, getProviders } from 'next-auth/react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import { FaGoogle, FaFacebook, FaInstagram, FaTwitter, FaTiktok } from 'react-icons/fa'
 
-function SignInForm() {
+export default function SignInPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [providers, setProviders] = useState<any>(null)
+  const [isClient, setIsClient] = useState(false)
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   useEffect(() => {
-    const urlMessage = searchParams.get('message')
-    if (urlMessage) {
-      setMessage(urlMessage)
+    setIsClient(true)
+    
+    // Handle URL message on client side only
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const urlMessage = urlParams.get('message')
+      if (urlMessage) {
+        setMessage(urlMessage)
+      }
     }
 
     // Get available providers safely
@@ -31,7 +37,7 @@ function SignInForm() {
         console.log('Auth providers not available')
       })
     }
-  }, [searchParams])
+  }, [])
 
   const handleSocialSignIn = async (providerId: string) => {
     try {
@@ -205,23 +211,5 @@ function SignInForm() {
         </div>
       </Card>
     </div>
-  )
-}
-
-// Loading component for Suspense fallback
-function SignInLoading() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-    </div>
-  )
-}
-
-// Main export with Suspense wrapper
-export default function SignInPage() {
-  return (
-    <Suspense fallback={<SignInLoading />}>
-      <SignInForm />
-    </Suspense>
   )
 }

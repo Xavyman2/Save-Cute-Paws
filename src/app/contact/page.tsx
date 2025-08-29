@@ -1,18 +1,23 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
-const ContactForm = () => {
-  const searchParams = useSearchParams();
+const ContactPage = () => {
   const [selectedSubject, setSelectedSubject] = useState('');
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    const subjectParam = searchParams.get('subject');
-    if (subjectParam) {
-      setSelectedSubject(subjectParam);
+    setIsClient(true);
+    
+    // Only use search params on client side
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const subjectParam = urlParams.get('subject');
+      if (subjectParam) {
+        setSelectedSubject(subjectParam);
+      }
     }
-  }, [searchParams]);
+  }, []);
   return (
     <div className="container mx-auto px-4 py-16">
       <h1 className="text-4xl font-bold text-center mb-12">Contact Us</h1>
@@ -153,25 +158,5 @@ const ContactForm = () => {
     </div>
   );
 };
-
-// Loading component for Suspense fallback
-function ContactLoading() {
-  return (
-    <div className="container mx-auto px-4 py-16">
-      <div className="flex justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    </div>
-  )
-}
-
-// Main export with Suspense wrapper
-const ContactPage = () => {
-  return (
-    <Suspense fallback={<ContactLoading />}>
-      <ContactForm />
-    </Suspense>
-  )
-}
 
 export default ContactPage;
