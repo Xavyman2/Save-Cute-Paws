@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-const ContactPage = () => {
+const ContactForm = () => {
   const searchParams = useSearchParams();
   const [selectedSubject, setSelectedSubject] = useState('');
 
@@ -153,5 +153,25 @@ const ContactPage = () => {
     </div>
   );
 };
+
+// Loading component for Suspense fallback
+function ContactLoading() {
+  return (
+    <div className="container mx-auto px-4 py-16">
+      <div className="flex justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    </div>
+  )
+}
+
+// Main export with Suspense wrapper
+const ContactPage = () => {
+  return (
+    <Suspense fallback={<ContactLoading />}>
+      <ContactForm />
+    </Suspense>
+  )
+}
 
 export default ContactPage;
