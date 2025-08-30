@@ -1,13 +1,15 @@
-import { client } from "@/sanity/lib/client"
+import { blogClient } from "@/sanity/lib/blogClient"
 import { groq } from "next-sanity"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Calendar, User, ArrowRight } from "lucide-react"
 
-export const revalidate = 30 // revalidate this page every 30 seconds
+// Force dynamic rendering for fresh blog posts
+export const dynamic = 'force-dynamic'
+export const revalidate = 0 // Disable caching for immediate updates
 
 const BlogPage = async () => {
-  const posts = await client.fetch(groq`*[_type == "post" && defined(publishedAt)]{
+  const posts = await blogClient.fetch(groq`*[_type == "post" && defined(publishedAt)]{
     _id,
     title,
     "slug": slug.current,
