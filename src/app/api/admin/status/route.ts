@@ -12,12 +12,13 @@ const client = createClient({
 
 export async function GET() {
   try {
-    // Test Sanity connection
-    const result = await client.fetch(`*[_type == "user"] | count()`)
+    // Test Sanity connection - use length to count documents
+    const users = await client.fetch(`*[_type == "user"]`)
+    const userCount = users.length
     
     return NextResponse.json({ 
       status: 'connected',
-      userCount: result,
+      userCount: userCount,
       message: 'Sanity CMS is properly configured'
     })
   } catch (error) {

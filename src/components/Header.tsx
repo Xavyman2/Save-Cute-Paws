@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { ModeToggle } from './ModeToggle';
@@ -48,8 +49,15 @@ const Header = () => {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="text-2xl font-bold text-foreground hover:text-primary transition-colors duration-300">
-              Save Cute Paws
+            <Link href="/" className="hover:opacity-80 transition-opacity duration-300">
+              <Image
+                src="/save-cute-paws-logo2.png"
+                alt="Save Cute Paws Logo"
+                width={320}
+                height={180}
+                className="h-14 w-auto"
+                priority
+              />
             </Link>
           </div>
 

@@ -17,8 +17,8 @@ export async function GET() {
       *[_type == "post"] | order(_createdAt desc) {
         _id,
         title,
-        slug,
-        author->{name},
+        "slug": slug.current,
+        "author": author->name,
         publishedAt,
         _createdAt
       }

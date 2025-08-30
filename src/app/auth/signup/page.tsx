@@ -15,8 +15,6 @@ export default function SignUpPage() {
     email: '',
     password: '',
     confirmPassword: '',
-    phone: '',
-    address: '',
     isVolunteer: false,
     volunteerSkills: '',
     bio: ''
@@ -215,35 +213,6 @@ export default function SignUpPage() {
               value={formData.confirmPassword}
               onChange={handleChange}
               placeholder="Confirm your password"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-              Phone Number
-            </label>
-            <Input
-              id="phone"
-              name="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={handleChange}
-              placeholder="Enter your phone number"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-              Address
-            </label>
-            <textarea
-              id="address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              placeholder="Enter your address"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              rows={2}
             />
           </div>
 

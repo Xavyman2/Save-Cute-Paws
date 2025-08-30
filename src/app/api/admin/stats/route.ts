@@ -10,16 +10,30 @@ const client = createClient({
   token: process.env.SANITY_API_TOKEN,
 })
 
+interface Post {
+  _type: string;
+  publishedAt?: string;
+}
+
+interface User {
+  _type: string;
+  isVolunteer?: boolean;
+}
+
 export async function GET() {
   try {
-    // Fetch all stats in parallel
-    const [totalPosts, publishedPosts, draftPosts, totalUsers, volunteers] = await Promise.all([
-      client.fetch(`count(*[_type == "post"])`),
-      client.fetch(`count(*[_type == "post" && defined(publishedAt)])`),
-      client.fetch(`count(*[_type == "post" && !defined(publishedAt)])`),
-      client.fetch(`count(*[_type == "user"])`),
-      client.fetch(`count(*[_type == "user" && isVolunteer == true])`)
+    // Fetch all data and count on the client side
+    const [allPosts, allUsers] = await Promise.all([
+      client.fetch(`*[_type == "post"]`) as Promise<Post[]>,
+      client.fetch(`*[_type == "user"]`) as Promise<User[]>
     ])
+
+    // Calculate stats
+    const totalPosts = allPosts.length
+    const publishedPosts = allPosts.filter((post: Post) => post.publishedAt).length
+    const draftPosts = allPosts.filter((post: Post) => !post.publishedAt).length
+    const totalUsers = allUsers.length
+    const volunteers = allUsers.filter((user: User) => user.isVolunteer === true).length
 
     const stats = {
       totalPosts: totalPosts || 0,
